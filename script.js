@@ -1,29 +1,58 @@
-function calculate() {
-    // Get inputs
-    const roomLength = parseFloat(document.getElementById("roomLength").value);
-    const roomWidth = parseFloat(document.getElementById("roomWidth").value);
-    const sqmPerBox = parseFloat(document.getElementById("sqmPerBox").value);
-    const boxPrice = parseFloat(document.getElementById("boxPrice").value);
-    const fixingCost = parseFloat(document.getElementById("fixingCost").value);
-    const numberOfFixes = parseInt(document.getElementById("numberOfFixes").value);
+const shapeSelect = document.getElementById('shape');
+const unitSelect = document.getElementById('unit');
+const widthInput = document.getElementById('width');
+const lengthInput = document.getElementById('length');
+const radiusInput = document.getElementById('radius');
+const sqmDisplay = document.getElementById('sqm');
+const tileBagsDisplay = document.getElementById('tile-bags');
 
-    // Validate inputs
-    if (isNaN(roomLength) || isNaN(roomWidth) || isNaN(sqmPerBox) || isNaN(boxPrice) || isNaN(fixingCost) || isNaN(numberOfFixes)) {
-        document.getElementById("result").innerText = "Please enter valid numbers.";
-        return;
+function calculateArea() {
+    let area = 0;
+    let shape = shapeSelect.value;
+    let unit = unitSelect.value;
+
+    if (shape === 'rectangle') {
+        const width = parseFloat(widthInput.value);
+        const length = parseFloat(lengthInput.value);
+
+        if (!isNaN(width) && !isNaN(length)) {
+            area = width * length;
+        }
+    } else if (shape === 'circle') {
+        const radius = parseFloat(radiusInput.value);
+
+        if (!isNaN(radius)) {
+            area = Math.PI * Math.pow(radius, 2);
+        }
     }
 
-    // Calculate area of the room
-    const roomArea = roomLength * roomWidth;
+    // Convert to square meters if unit is in feet
+    if (unit === 'feet') {
+        area = area * 0.092903; // 1 sq ft = 0.092903 sq meters
+    }
 
-    // Calculate number of boxes needed (rounding up)
-    const boxesNeeded = Math.ceil(roomArea / sqmPerBox);
-
-    // Calculate total cost
-    const totalBoxCost = boxesNeeded * boxPrice;
-    const totalFixingCost = numberOfFixes * fixingCost;
-    const totalCost = totalBoxCost + totalFixingCost;
-
-    // Display result
-    document.getElementById("result").innerText = `Room Area: ${roomArea.toFixed(2)} m²\nBoxes Needed: ${boxesNeeded}\nTotal Cost (Boxes + Fixing): = R${totalCost.toFixed(2)}`;
+    if (area > 0) {
+        sqmDisplay.textContent = area.toFixed(2);
+        const tileBags = Math.ceil(area / 5); // Assuming 1 bag covers 5 sqm
+        tileBagsDisplay.textContent = tileBags;
+    } else {
+        sqmDisplay.textContent = '0';
+        tileBagsDisplay.textContent = '0';
+    }
 }
+
+// Listen for input changes
+widthInput.addEventListener('input', calculateArea);
+lengthInput.addEventListener('input', calculateArea);
+radiusInput.addEventListener('input', calculateArea);
+shapeSelect.addEventListener('change', function() {
+    if (shapeSelect.value === 'circle') {
+        document.getElementById('rectangle-inputs').style.display = 'none';
+        document.getElementById('circle-inputs').style.display = 'block';
+    } else {
+        document.getElementById('rectangle-inputs').style.display = 'block';
+        document.getElementById('circle-inputs').style.display = 'none';
+    }
+    calculateArea();
+});
+unitSelect.addEventListener('change', calculateArea);
