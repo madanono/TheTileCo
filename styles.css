@@ -3,7 +3,7 @@
 }
 
 body {
-    background-image: url('l.png');
+    background-image: l.png ;
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
